@@ -13,30 +13,28 @@ jobs:
       - name: Baixar repositorio
         uses: actions/checkout@v4
 
+      - name: Descompactar o Mod
+        run: |
+          unzip -o *.zip
+          if [ -d "Voidborn" ]; then
+            cp -r Voidborn/* . 2>/dev/null || true
+          fi
+          find . -name "gradlew" -exec chmod +x {} +
+
       - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Descompactar Mod
+      - name: Compilar (.java para .class)
         run: |
-          mkdir -p extrair_temp
-          unzip -o *.zip -d extrair_temp/
-          BUILD_FILE=$(find extrair_temp -name "build.gradle" | head -n 1)
-          if [ -n "$BUILD_FILE" ]; then
-            PROJECT_DIR=$(dirname "$BUILD_FILE")
-            cp -r "$PROJECT_DIR"/* .
+          if [ -f "./gradlew" ]; then
+            ./gradlew build
+          else
+            cd $(dirname $(find . -name "gradlew" | head -n 1))
+            ./gradlew build
           fi
-          rm -rf extrair_temp
-
-      - name: Gerar Executavel e Compilar
-        run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
-          chmod +x gradlew
-          ./gradlew build --stacktrace -x test --no-daemon
 
       - name: Enviar arquivo .jar pronto
         uses: actions/upload-artifact@v4
