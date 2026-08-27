@@ -19,16 +19,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Descompactar e Localizar Projeto
+      - name: Descompactar Mod
         run: |
-          unzip -o *.zip
-          BUILD_PATH=$(find . -name "build.gradle" -not -path "*/.github/*" | head -n 1)
-          if [ -n "$BUILD_PATH" ]; then
-            PROJECT_DIR=$(dirname "$BUILD_PATH")
-            if [ "$PROJECT_DIR" != "." ]; then
-              cp -r "$PROJECT_DIR"/* . 2>/dev/null || true
-            fi
+          mkdir -p extrair_temp
+          unzip -o *.zip -d extrair_temp/
+          BUILD_FILE=$(find extrair_temp -name "build.gradle" | head -n 1)
+          if [ -n "$BUILD_FILE" ]; then
+            PROJECT_DIR=$(dirname "$BUILD_FILE")
+            cp -r "$PROJECT_DIR"/* .
           fi
+          rm -rf extrair_temp
 
       - name: Gerar Executavel e Compilar
         run: |
