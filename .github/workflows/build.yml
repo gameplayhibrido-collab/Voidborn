@@ -15,10 +15,14 @@ jobs:
 
       - name: Descompactar o Mod
         run: |
-          unzip -o *.zip
-          if [ -d "Voidborn" ]; then
-            cp -r Voidborn/* . 2>/dev/null || true
+          mkdir -p temp_mod
+          unzip -o *.zip -d temp_mod/
+          if [ -d "temp_mod/Voidborn" ]; then
+            cp -r temp_mod/Voidborn/* . 2>/dev/null || true
+          else
+            cp -r temp_mod/* . 2>/dev/null || true
           fi
+          rm -rf temp_mod
           find . -name "gradlew" -exec chmod +x {} +
 
       - name: Configurar Java 17
